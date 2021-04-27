@@ -1,0 +1,290 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema NoFallesAsiste
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema NoFallesAsiste
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `NoFallesAsiste` ;
+USE `NoFallesAsiste` ;
+
+-- -----------------------------------------------------
+-- Table `NoFallesAsiste`.`horario`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `NoFallesAsiste`.`horario` (
+  `idhorario` INT NOT NULL,
+  `tipo_horario` VARCHAR(45) NOT NULL,
+  `jornada` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idhorario`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `NoFallesAsiste`.`tipo_programa`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `NoFallesAsiste`.`tipo_programa` (
+  `idtipo_programa` INT NOT NULL,
+  `tipo_programa` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idtipo_programa`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `NoFallesAsiste`.`programa`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `NoFallesAsiste`.`programa` (
+  `idprograma` INT NOT NULL,
+  `nombre_programa` VARCHAR(45) NOT NULL,
+  `tipo_programa_idtipo_programa` INT NOT NULL,
+  PRIMARY KEY (`idprograma`, `tipo_programa_idtipo_programa`),
+  INDEX `fk_programa_tipo_programa1_idx` (`tipo_programa_idtipo_programa` ASC) ,
+  CONSTRAINT `fk_programa_tipo_programa1`
+    FOREIGN KEY (`tipo_programa_idtipo_programa`)
+    REFERENCES `NoFallesAsiste`.`tipo_programa` (`idtipo_programa`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `NoFallesAsiste`.`ficha`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `NoFallesAsiste`.`ficha` (
+  `idficha` INT(11) NOT NULL COMMENT 'el id de la fecha se relaciona con la ficha para saber los dias en que la ficha se le asigna una clase',
+  `tipo_horario_idtipo_horario` INT NOT NULL,
+  `programa_idprograma` INT NOT NULL,
+  `fechaInicioFormacion` DATE NOT NULL,
+  PRIMARY KEY (`idficha`, `tipo_horario_idtipo_horario`, `programa_idprograma`),
+  INDEX `fk_ficha_tipo_horario1_idx` (`tipo_horario_idtipo_horario` ASC) ,
+  INDEX `fk_ficha_programa1_idx` (`programa_idprograma` ASC) ,
+  CONSTRAINT `fk_ficha_tipo_horario1`
+    FOREIGN KEY (`tipo_horario_idtipo_horario`)
+    REFERENCES `NoFallesAsiste`.`horario` (`idhorario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_ficha_programa1`
+    FOREIGN KEY (`programa_idprograma`)
+    REFERENCES `NoFallesAsiste`.`programa` (`idprograma`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `NoFallesAsiste`.`clase`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `NoFallesAsiste`.`clase` (
+  `idclase` INT(11) NOT NULL COMMENT 'cada clase es unica y tiene su respectivo id',
+  `fechayhora` DATETIME NOT NULL COMMENT 'como es unica la clase tiene una fecha y hora que no se puede repetir',
+  `aula` VARCHAR(45) NOT NULL COMMENT 'cada clase se desarrolla en su respectiva aula de clase previamente programada para que no se cruce con otra clase',
+  `nombre_clase` VARCHAR(45) NOT NULL COMMENT 'se referencia la ficha para tener claridad  meridiana ',
+  `ficha_idficha` INT(11) NOT NULL,
+  PRIMARY KEY (`idclase`, `ficha_idficha`),
+  INDEX `fk_clase_ficha1_idx` (`ficha_idficha` ASC) ,
+  CONSTRAINT `fk_clase_ficha1`
+    FOREIGN KEY (`ficha_idficha`)
+    REFERENCES `NoFallesAsiste`.`ficha` (`idficha`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `NoFallesAsiste`.`estado_novedad`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `NoFallesAsiste`.`estado_novedad` (
+  `idestado_asistencia` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'se el asigna un codigo unico a cada justificacion subida por el aprendiz',
+  `estado _asistencia` VARCHAR(45) NOT NULL COMMENT 'aqui se guarda la repectiva justificacion en formaro pdf',
+  PRIMARY KEY (`idestado_asistencia`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `NoFallesAsiste`.`rol`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `NoFallesAsiste`.`rol` (
+  `idrol` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'se le asigna un codigo unico a cada uno de los roles',
+  `nombre_rol` VARCHAR(45) NOT NULL COMMENT 'se agrega el nombre del rol',
+  PRIMARY KEY (`idrol`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `NoFallesAsiste`.`tipo_documento`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `NoFallesAsiste`.`tipo_documento` (
+  `idtipo_documento` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'es el codigo que se le asigna a cada tipo de documento',
+  `tipo_documento` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idtipo_documento`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `NoFallesAsiste`.`Estado_usuario`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `NoFallesAsiste`.`Estado_usuario` (
+  `idestado_usuario` INT NOT NULL,
+  `tipo_estado_usuario` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idestado_usuario`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `NoFallesAsiste`.`usuario`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `NoFallesAsiste`.`usuario` (
+  `id_usuario` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'el usuario es el codigo unico que se asigna en el momento de crear la cuenta',
+  `contraseña` VARCHAR(45) NOT NULL,
+  `nombre` VARCHAR(45) NOT NULL COMMENT 'se agrega el respectivo nombre del usuario',
+  `apellido` VARCHAR(45) NOT NULL COMMENT 'se agrega el respectivo apellido del usuario',
+  `numero_documento` INT NOT NULL COMMENT 'se agrega el respectivo numero de documento del usuario ',
+  `direccion` VARCHAR(45) NOT NULL,
+  `tipo_documento_idtipo_documento` INT(11) NOT NULL,
+  `ficha_idficha` INT(11) NOT NULL,
+  `rol_idrol` INT(11) NOT NULL,
+  `Estado_usuario_idestado_usuario` INT NOT NULL,
+  PRIMARY KEY (`id_usuario`, `tipo_documento_idtipo_documento`, `ficha_idficha`, `rol_idrol`, `Estado_usuario_idestado_usuario`),
+  INDEX `fk_usuario_tipo_documento1_idx` (`tipo_documento_idtipo_documento` ASC) ,
+  INDEX `fk_usuario_ficha1_idx` (`ficha_idficha` ASC) ,
+  INDEX `fk_usuario_rol1_idx` (`rol_idrol` ASC) ,
+  INDEX `fk_usuario_Estado_usuario1_idx` (`Estado_usuario_idestado_usuario` ASC) ,
+  CONSTRAINT `fk_usuario_tipo_documento1`
+    FOREIGN KEY (`tipo_documento_idtipo_documento`)
+    REFERENCES `NoFallesAsiste`.`tipo_documento` (`idtipo_documento`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_usuario_ficha1`
+    FOREIGN KEY (`ficha_idficha`)
+    REFERENCES `NoFallesAsiste`.`ficha` (`idficha`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_usuario_rol1`
+    FOREIGN KEY (`rol_idrol`)
+    REFERENCES `NoFallesAsiste`.`rol` (`idrol`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_usuario_Estado_usuario1`
+    FOREIGN KEY (`Estado_usuario_idestado_usuario`)
+    REFERENCES `NoFallesAsiste`.`Estado_usuario` (`idestado_usuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+AUTO_INCREMENT = 2
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `NoFallesAsiste`.`correo`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `NoFallesAsiste`.`correo` (
+  `idcorreos` VARCHAR(45) NOT NULL,
+  `correo_institucional` VARCHAR(45) NOT NULL,
+  `correo_personal` VARCHAR(45) NULL,
+  `usuario_id_usuario` INT(11) NOT NULL,
+  PRIMARY KEY (`idcorreos`, `usuario_id_usuario`),
+  INDEX `fk_correo_usuario1_idx` (`usuario_id_usuario` ASC) ,
+  CONSTRAINT `fk_correo_usuario1`
+    FOREIGN KEY (`usuario_id_usuario`)
+    REFERENCES `NoFallesAsiste`.`usuario` (`id_usuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `NoFallesAsiste`.`telefono`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `NoFallesAsiste`.`telefono` (
+  `idtelefono` INT NOT NULL,
+  `telefono_fijo` INT NULL,
+  `telefono_celular` INT NOT NULL,
+  `usuario_id_usuario` INT(11) NOT NULL,
+  PRIMARY KEY (`idtelefono`, `usuario_id_usuario`),
+  INDEX `fk_telefono_usuario1_idx` (`usuario_id_usuario` ASC) ,
+  CONSTRAINT `fk_telefono_usuario1`
+    FOREIGN KEY (`usuario_id_usuario`)
+    REFERENCES `NoFallesAsiste`.`usuario` (`id_usuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `NoFallesAsiste`.`tipo_asistencia`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `NoFallesAsiste`.`tipo_asistencia` (
+  `idtipo_asistencia` INT NOT NULL,
+  `asistencia` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idtipo_asistencia`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `NoFallesAsiste`.`justificacion`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `NoFallesAsiste`.`justificacion` (
+  `idjustificacion` INT NOT NULL,
+  `justificacion` MULTIPOLYGON NULL,
+  PRIMARY KEY (`idjustificacion`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `NoFallesAsiste`.`tipo_asistencia_usuario`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `NoFallesAsiste`.`tipo_asistencia_usuario` (
+  `idtipo_asistencia_usuario` INT NOT NULL,
+  `tipo_asistencia_tipo_asistencia` INT NOT NULL,
+  `clase_idclase` INT(11) NOT NULL,
+  `usuario_id_usuario` INT(11) NOT NULL,
+  `estado_novedad_idestado_asistencia` INT(11) NULL,
+  `justificacion_idjustificacion` INT NULL,
+  PRIMARY KEY (`idtipo_asistencia_usuario`, `tipo_asistencia_tipo_asistencia`, `clase_idclase`, `usuario_id_usuario`, `estado_novedad_idestado_asistencia`, `justificacion_idjustificacion`),
+  INDEX `fk_tipo_asistencia_usuario_tipo_asistencia1_idx` (`tipo_asistencia_tipo_asistencia` ASC) ,
+  INDEX `fk_tipo_asistencia_usuario_clase1_idx` (`clase_idclase` ASC) ,
+  INDEX `fk_tipo_asistencia_usuario_usuario1_idx` (`usuario_id_usuario` ASC) ,
+  INDEX `fk_tipo_asistencia_usuario_estado_novedad1_idx` (`estado_novedad_idestado_asistencia` ASC) ,
+  INDEX `fk_tipo_asistencia_usuario_justificacion1_idx` (`justificacion_idjustificacion` ASC) ,
+  CONSTRAINT `fk_tipo_asistencia_usuario_tipo_asistencia1`
+    FOREIGN KEY (`tipo_asistencia_tipo_asistencia`)
+    REFERENCES `NoFallesAsiste`.`tipo_asistencia` (`idtipo_asistencia`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_tipo_asistencia_usuario_clase1`
+    FOREIGN KEY (`clase_idclase`)
+    REFERENCES `NoFallesAsiste`.`clase` (`idclase`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_tipo_asistencia_usuario_usuario1`
+    FOREIGN KEY (`usuario_id_usuario`)
+    REFERENCES `NoFallesAsiste`.`usuario` (`id_usuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_tipo_asistencia_usuario_estado_novedad1`
+    FOREIGN KEY (`estado_novedad_idestado_asistencia`)
+    REFERENCES `NoFallesAsiste`.`estado_novedad` (`idestado_asistencia`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_tipo_asistencia_usuario_justificacion1`
+    FOREIGN KEY (`justificacion_idjustificacion`)
+    REFERENCES `NoFallesAsiste`.`justificacion` (`idjustificacion`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

@@ -1,0 +1,116 @@
+<?php 
+class usuario{
+	private $name="no hay nombre";
+	public $apellido;
+	private $nroDoc;
+	private $tipoDoc;
+	private $nroFicha;
+	private $email;
+	private $rol;
+	private $contraseña;
+	private $estado;
+	public $numeroFavorito;
+	
+
+	function __construct($numeroFavorito,$apellido,$name){
+
+	$this->numeroFavorito = $numeroFavorito;
+	$this->apellido = $apellido;
+	$this->name = $name;
+	
+	
+
+ 	}
+ 	public function setName($name)
+ 	{
+ 		$this->name = $name;
+ 	}
+ 	
+
+ 	public function registrarUser($name, $apellido, $nroDoc,$tipoDoc,$nroFicha,$email,$rol,$contraseña,$estado)
+ 	{
+ 		$mysqli = new mysqli("localhost","root","","NoFallesAsiste");
+	   	$mysqli->query("INSERT INTO usuario
+	    ( contraseña, nombre, apellido, numero_documento, direccion, tipo_documento_idtipo_documento, 
+        ficha_idficha, rol_idrol, Estado_usuario_idestado_usuario) 
+	    	VALUES ('$contraseña', '$name','$apellido', $nroDoc, '$email', $tipoDoc, $nroFicha, $rol, $estado)");
+	   	echo $name." very Nice, dato recibido.. ";
+ 	}
+ 	public function mostrarName()
+ 	{	
+ 		echo ".........................";
+ 		echo $this->name;
+ 		echo $this->apellido;
+ 		echo $this->numeroFavorito;
+ 		
+ 	}
+
+ 	
+}
+
+if (isset($_POST['register'])) {
+    if (strlen($_POST['Nombre']) >= 1 && strlen($_POST['Apellido']) >= 1) {
+
+	    $name = trim($_POST['Nombre']);
+	    $apellido = trim($_POST['Apellido']);
+	    $nroDoc = trim($_POST['nroDocumento']);
+	    $tipoDoc = trim($_POST['tipoDocumento']);
+	    $nroFicha = trim($_POST['nroFicha']);
+	    $email = trim($_POST['correo']);
+	    $rol = trim($_POST['rol']);
+	    $contraseña = trim($_POST['contraseña']);
+	    $estado=1;
+	    $fechareg = date("d/m/y");
+	    $starlen= strlen($_POST['Nombre']);
+	    echo "<strong>Yo soy starlen<br>".$starlen,"</strong><br><br>";
+	    
+
+	    $objEnviar = new usuario (3,$apellido,$name,$starlen);
+	    $objEnviar->setName($name);
+	 	$objEnviar->registrarUser($name, $apellido, $nroDoc, $tipoDoc, $nroFicha, $email, $rol, $contraseña, $estado, $fechareg);
+	 	$objEnviar->mostrarName();
+	    
+	    
+	   	
+
+	    
+	    
+	}
+	else{
+		echo "error al ingresar usuario";
+		echo "<br>VERIFIQUE LOS DATOS INGRESADORS";
+	}
+}
+
+/*formulario
+	    Nombre
+	    Apellido
+	    nroDocumento
+	    tipoDocumento
+	    nroFicha
+	    correo
+	    rol
+	    contraseña
+		
+		$this->name = $name;
+		$this->apellido = $apellido;
+		$this->nroDoc = $nroDoc;
+		$this->tipoDoc = $tipoDoc;
+		$this->nroFicha = $nroFicha;
+		$this->email = $email;
+		$this->rol = $rol;
+		$this->contraseña = $contraseña;
+		$this->estado = $estado; 
+
+		$name 
+	    $apellido 
+	    $nroDoc 
+	    $tipoDoc 
+	    $nroFicha 
+	    $email 
+	    $rol 
+	    $contraseña 
+	    $estado
+	    $fechareg 
+	    */
+?>
